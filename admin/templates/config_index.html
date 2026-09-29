@@ -1,0 +1,275 @@
+{% extends "admin_base.html" %}
+{% block title %}系统配置 - Harness Admin{% endblock %}
+{% block page_title %}系统配置{% endblock %}
+
+{% block content %}
+<input type="hidden" id="config-version" value="{{ config_version }}">
+
+<div class="mb-3 d-flex flex-wrap gap-2">
+  <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('admin.config_backup_page') }}">备份管理</a>
+  <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('admin.config_export') }}">导出（脱敏）</a>
+  <a class="btn btn-outline-warning btn-sm" href="{{ url_for('admin.config_export', include_sensitive=1) }}"
+     onclick="return confirm('导出将包含敏感字段明文，确认继续？');">导出（含敏感）</a>
+  <button type="button" class="btn btn-outline-primary btn-sm" id="btn-undo">撤销上次修改（{{ undo_window_sec // 60 }}分钟内）</button>
+  <button type="button" class="btn btn-outline-danger btn-sm" id="btn-reset-all">恢复全部默认值</button>
+</div>
+
+<div id="config-alert" class="alert d-none" role="alert"></div>
+
+<ul class="nav nav-tabs" id="configTabs" role="tablist">
+  {% for group in groups %}
+  <li class="nav-item" role="presentation">
+    <button class="nav-link {% if loop.first %}active{% endif %}" id="tab-{{ group.id }}"
+            data-bs-toggle="tab" data-bs-target="#pane-{{ group.id }}" type="button" role="tab">
+      {{ group.label }}
+    </button>
+  </li>
+  {% endfor %}
+</ul>
+
+<div class="tab-content border border-top-0 p-3 bg-white rounded-bottom" id="configTabContent">
+  {% for group in groups %}
+  <div class="tab-pane fade {% if loop.first %}show active{% endif %}" id="pane-{{ group.id }}" role="tabpanel">
+    <form class="config-group-form" data-group="{{ group.id }}" onsubmit="return false;">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      {% for item in group['items'] %}
+        {% include "partials/config_field.html" %}
+      {% endfor %}
+      <button type="button" class="btn btn-primary btn-save-group">保存本组</button>
+    </form>
+  </div>
+  {% endfor %}
+</div>
+
+<hr class="my-4">
+<h5>导入配置</h5>
+<form id="import-form" enctype="multipart/form-data" class="row g-2 align-items-end">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <input type="hidden" name="version" value="{{ config_version }}">
+  <div class="col-md-6">
+    <input type="file" class="form-control" name="file" accept="application/json,.json" required>
+  </div>
+  <div class="col-auto">
+    <button type="submit" class="btn btn-secondary">导入 JSON</button>
+  </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+  const csrf = document.querySelector('input[name="csrf_token"]').value;
+  const configVersion = document.getElementById('config-version').value;
+  const alertBox = document.getElementById('config-alert');
+
+  // Bootstrap tooltips for restart badges
+  document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (el) {
+    if (window.bootstrap && bootstrap.Tooltip) {
+      new bootstrap.Tooltip(el);
+    }
+  });
+
+  function showAlert(ok, msg) {
+    alertBox.classList.remove('d-none', 'alert-success', 'alert-danger', 'alert-warning');
+    alertBox.classList.add(ok ? 'alert-success' : 'alert-danger');
+    alertBox.textContent = msg;
+  }
+
+  function fieldValue(field) {
+    const type = field.dataset.type;
+    const input = field.querySelector('.config-input');
+    if (!input) return null;
+    if (type === 'bool') return !!input.checked;
+    return input.value;
+  }
+
+  function fieldChanged(field) {
+    const input = field.querySelector('.config-input');
+    if (!input) return false;
+    if (field.dataset.type === 'bool') {
+      const initial = input.hasAttribute('checked');
+      return input.checked !== initial;
+    }
+    return input.value !== input.defaultValue;
+  }
+
+  function showDependsWarning(field) {
+    const box = field.querySelector('.depends-warning');
+    if (!box) return;
+    const hint = field.dataset.dependsHint;
+    const deps = (field.dataset.dependsOn || '').split(',').filter(Boolean);
+    if (!hint && !deps.length) {
+      box.classList.add('d-none');
+      return;
+    }
+    let msg = '此项修改后，建议同步检查：';
+    if (hint) {
+      msg += hint;
+    } else {
+      msg += deps.join('、');
+    }
+    box.textContent = msg;
+    box.classList.remove('d-none');
+  }
+
+  function hideDependsWarning(field) {
+    const box = field.querySelector('.depends-warning');
+    if (box) box.classList.add('d-none');
+  }
+
+  document.querySelectorAll('.config-field').forEach(function (field) {
+    const input = field.querySelector('.config-input');
+    if (!input) return;
+    const onChange = function () {
+      if (fieldChanged(field)) {
+        showDependsWarning(field);
+      } else {
+        hideDependsWarning(field);
+      }
+    };
+    input.addEventListener('input', onChange);
+    input.addEventListener('change', onChange);
+  });
+
+  // range ↔ number sync
+  document.querySelectorAll('.config-range').forEach(function (range) {
+    const target = document.getElementById(range.dataset.target);
+    if (!target) return;
+    range.addEventListener('input', function () { target.value = range.value; target.dispatchEvent(new Event('input')); });
+    target.addEventListener('input', function () { range.value = target.value; });
+  });
+
+  function collectUpdates(form) {
+    const updates = {};
+    form.querySelectorAll('.config-field').forEach(function (field) {
+      const key = field.dataset.key;
+      updates[key] = fieldValue(field);
+    });
+    return updates;
+  }
+
+  function collectChangedRestartLabels(form, updates) {
+    const labels = [];
+    form.querySelectorAll('.config-field[data-effective="require_restart"]').forEach(function (field) {
+      if (!fieldChanged(field)) return;
+      const label = field.querySelector('.form-label');
+      if (label) {
+        labels.push(label.childNodes[0].textContent.trim());
+      } else {
+        labels.push(field.dataset.key);
+      }
+    });
+    return labels;
+  }
+
+  async function postJson(url, body) {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrf,
+        'X-Requested-With': 'XMLHttpRequest',
+      },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json().catch(function () { return {}; });
+    return { res: res, data: data };
+  }
+
+  document.querySelectorAll('.btn-save-group').forEach(function (btn) {
+    btn.addEventListener('click', async function () {
+      const form = btn.closest('form');
+      const updates = collectUpdates(form);
+      const restartLabels = collectChangedRestartLabels(form, updates);
+      let confirmMsg = '确定要修改配置吗？修改将立即生效。';
+      if (restartLabels.length) {
+        confirmMsg = '以下配置需重启服务后生效：' + restartLabels.join('、') +
+          '。是否继续保存？';
+      }
+      if (!confirm(confirmMsg)) return;
+
+      form.querySelectorAll('.field-error').forEach(function (el) {
+        el.style.setProperty('display', 'none', 'important');
+        el.textContent = '';
+      });
+      const { res, data } = await postJson('{{ url_for("admin.config_save") }}', {
+        updates: updates,
+        version: configVersion,
+      });
+      if (res.status === 409) {
+        showAlert(false, data.message || '配置已被其他管理员修改，请刷新后重试');
+        return;
+      }
+      if (data.errors) {
+        Object.keys(data.errors).forEach(function (key) {
+          if (key === '_version') return;
+          const field = form.querySelector('.config-field[data-key="' + key + '"]');
+          if (!field) return;
+          const err = field.querySelector('.field-error');
+          err.textContent = data.errors[key];
+          err.style.removeProperty('display');
+          err.style.display = 'block';
+        });
+      }
+      showAlert(!!data.ok, data.message || (res.ok ? '配置已更新' : '保存失败'));
+      if (data.ok) {
+        form.querySelectorAll('.config-field[data-sensitive="1"] input').forEach(function (inp) {
+          if (inp.value && inp.value !== '{{ mask }}') {
+            inp.value = '{{ mask }}';
+          }
+        });
+        form.querySelectorAll('.config-input').forEach(function (inp) {
+          if (inp.type === 'checkbox') {
+            if (inp.checked) inp.setAttribute('checked', 'checked');
+            else inp.removeAttribute('checked');
+          } else {
+            inp.defaultValue = inp.value;
+          }
+        });
+        form.querySelectorAll('.depends-warning').forEach(function (el) {
+          el.classList.add('d-none');
+        });
+      }
+    });
+  });
+
+  document.getElementById('btn-undo').addEventListener('click', async function () {
+    const { data } = await postJson('{{ url_for("admin.config_undo") }}', {});
+    showAlert(!!data.ok, data.message || '');
+    if (data.ok) setTimeout(function () { location.reload(); }, 600);
+  });
+
+  document.getElementById('btn-reset-all').addEventListener('click', async function () {
+    if (!confirm('确定将全部配置恢复为默认值？修改将立即生效。')) return;
+    const { res, data } = await postJson('{{ url_for("admin.config_reset") }}', {
+      keys: null,
+      version: configVersion,
+    });
+    if (res.status === 409) {
+      showAlert(false, data.message || '配置已被其他管理员修改，请刷新后重试');
+      return;
+    }
+    showAlert(!!data.ok, data.message || '');
+    if (data.ok) setTimeout(function () { location.reload(); }, 600);
+  });
+
+  document.getElementById('import-form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    if (!confirm('确定导入配置吗？修改将立即生效。')) return;
+    const fd = new FormData(e.target);
+    const res = await fetch('{{ url_for("admin.config_import") }}', {
+      method: 'POST',
+      headers: { 'X-CSRFToken': csrf, 'X-Requested-With': 'XMLHttpRequest' },
+      body: fd,
+    });
+    const data = await res.json().catch(function () { return {}; });
+    if (res.status === 409) {
+      showAlert(false, data.message || '配置已被其他管理员修改，请刷新后重试');
+      return;
+    }
+    showAlert(!!data.ok, data.message || (res.ok ? '导入成功' : '导入失败'));
+    if (data.ok) setTimeout(function () { location.reload(); }, 800);
+  });
+})();
+</script>
+{% endblock %}

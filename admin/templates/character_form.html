@@ -1,0 +1,72 @@
+{% extends "admin_base.html" %}
+{% block title %}{{ title }} - Harness Admin{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block content %}
+{% if character and emotion_display %}
+<div class="card shadow-sm mb-3">
+  <div class="card-header">情绪状态（只读）</div>
+  <div class="card-body">
+    <div class="row g-3">
+      <div class="col-md-3">
+        <div class="text-muted small">愉悦度 (P)</div>
+        <div class="fw-semibold">{{ emotion_display.pleasure }}</div>
+      </div>
+      <div class="col-md-3">
+        <div class="text-muted small">激活度 (A)</div>
+        <div class="fw-semibold">{{ emotion_display.arousal }}</div>
+      </div>
+      <div class="col-md-3">
+        <div class="text-muted small">支配度 (D)</div>
+        <div class="fw-semibold">{{ emotion_display.dominance }}</div>
+      </div>
+      <div class="col-md-3">
+        <div class="text-muted small">剧情阶段</div>
+        <div class="fw-semibold">{{ emotion_display.stage_label }}</div>
+      </div>
+    </div>
+    <p class="text-muted small mb-0 mt-2">累计对话 {{ emotion_display.total_rounds }} 轮。情绪数据仅供运营查看，不可手动修改。</p>
+  </div>
+</div>
+{% endif %}
+<div class="card shadow-sm">
+  <div class="card-body">
+    <form method="post">
+      {{ form.hidden_tag() }}
+      <div class="mb-3">
+        {{ form.name.label(class="form-label") }}
+        {{ form.name(class="form-control") }}
+        {% for e in form.name.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+      </div>
+      <div class="mb-3">
+        {{ form.role.label(class="form-label") }}
+        {{ form.role(class="form-control") }}
+      </div>
+      <div class="mb-3">
+        {{ form.description.label(class="form-label") }}
+        {{ form.description(class="form-control", rows=3) }}
+        {% for e in form.description.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+      </div>
+      <div class="mb-3">
+        {{ form.system_prompt.label(class="form-label") }}
+        {{ form.system_prompt(class="form-control", rows=6) }}
+        {% for e in form.system_prompt.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+      </div>
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          {{ form.temperature.label(class="form-label") }}
+          {{ form.temperature(class="form-control") }}
+        </div>
+        <div class="col-md-6 mb-3">
+          {{ form.max_tokens.label(class="form-label") }}
+          {{ form.max_tokens(class="form-control") }}
+        </div>
+      </div>
+      {{ form.version() }}
+      <div class="d-flex gap-2">
+        {{ form.submit(class="btn btn-primary") }}
+        <a href="{{ url_for('admin.characters_list') }}" class="btn btn-secondary">取消</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

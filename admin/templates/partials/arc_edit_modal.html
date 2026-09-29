@@ -1,0 +1,29 @@
+<div class="modal fade" id="editGoalModal" tabindex="-1" aria-labelledby="editGoalModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="post">
+        {{ goal_edit_form.hidden_tag() }}
+        <input type="hidden" name="action" value="edit_goal">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editGoalModalLabel">编辑目标</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="关闭"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" name="goal_id" id="edit-goal-id" value="">
+          <div class="mb-3">
+            <label class="form-label" for="edit-goal-title">目标标题</label>
+            <input type="text" class="form-control" name="title" id="edit-goal-title" maxlength="200" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="edit-goal-desc">目标描述</label>
+            <textarea class="form-control" name="description" id="edit-goal-desc" rows="3" maxlength="1000"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+          <button type="submit" class="btn btn-primary">保存</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

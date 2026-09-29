@@ -1,0 +1,38 @@
+{% extends "admin_base.html" %}
+{% block title %}叙事状态 - {{ character.display_name }}{% endblock %}
+{% block page_title %}叙事状态：{{ character.display_name }}{% endblock %}
+{% block content %}
+<div class="mb-3">
+  <a href="{{ url_for('admin.characters_list') }}" class="btn btn-outline-secondary btn-sm">← 角色列表</a>
+  {% if current_user.is_admin %}
+  <a href="{{ url_for('admin.soul_core_edit', character_id=character.id) }}" class="btn btn-outline-danger btn-sm">编辑灵魂核心</a>
+  {% endif %}
+</div>
+
+{% if warnings %}
+  {% for w in warnings %}
+  <div class="alert alert-warning">{{ w }}</div>
+  {% endfor %}
+{% endif %}
+
+<div class="card shadow-sm">
+  <div class="card-body">
+    <p class="text-muted small">叙事状态（弧光阶段、当前目标）可在剧情推进中更新；核心性格请在「灵魂核心」页管理（仅管理员）。</p>
+    <form method="post">
+      {{ form.hidden_tag() }}
+      <div class="mb-3">
+        {{ form.arc_stage.label(class="form-label") }}
+        {{ form.arc_stage(class="form-select") }}
+      </div>
+      <div class="mb-3">
+        {{ form.current_goal.label(class="form-label") }}
+        {{ form.current_goal(class="form-control", rows=4) }}
+      </div>
+      <div class="d-flex gap-2">
+        {{ form.submit(class="btn btn-primary") }}
+        <a href="{{ url_for('admin.characters_list') }}" class="btn btn-secondary">取消</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,11 @@
+.sidebar {
+  min-width: 220px;
+  min-height: 100vh;
+}
+.stat-card .display-6 {
+  color: #0d6efd;
+}
+main {
+  background: #f8f9fa;
+  min-height: 100vh;
+}

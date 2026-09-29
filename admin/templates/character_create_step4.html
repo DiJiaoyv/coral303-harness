@@ -1,0 +1,40 @@
+{% extends "admin_base.html" if is_admin_view else "memory_user_base.html" %}
+{% from "partials/wizard_progress.html" import wizard_progress %}
+{% block title %}创建角色 · 世界观{% endblock %}
+{% block page_title %}创建角色向导{% endblock %}
+{% block content %}
+{{ wizard_progress(current_step) }}
+<div class="card shadow-sm">
+  <div class="card-header">第四步：世界观关联</div>
+  <div class="card-body">
+    <form method="post">
+      {{ form.hidden_tag() }}
+      <div class="mb-3">
+        {{ form.world_id.label(class="form-label") }}
+        {{ form.world_id(class="form-select") }}
+        <div class="form-text">可选。世界观规则将在对话 Prompt 中作为强约束注入。</div>
+      </div>
+      {% if is_admin_view %}
+      <div class="mb-3">
+        {{ form.owner_user_id.label(class="form-label") }}
+        {{ form.owner_user_id(class="form-select") }}
+        <div class="form-text">管理员可为指定用户创建角色；默认归属当前管理员。</div>
+      </div>
+      {% endif %}
+      {% if worlds %}
+      <ul class="list-group list-group-flush mb-3">
+        {% for w in worlds if w.id %}
+        <li class="list-group-item small">
+          <strong>{{ w.name }}</strong> — {{ w.summary }}
+        </li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+      <div class="d-flex gap-2">
+        {{ form.back_btn(class="btn btn-outline-secondary") }}
+        {{ form.next_btn(class="btn btn-primary") }}
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

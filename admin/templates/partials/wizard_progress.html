@@ -1,0 +1,14 @@
+{% macro wizard_progress(current_step) %}
+<div class="mb-4">
+  <div class="d-flex justify-content-between small text-muted mb-1">
+    <span class="{% if current_step >= 1 %}fw-bold text-primary{% endif %}">1.基本信息</span>
+    <span class="{% if current_step >= 2 %}fw-bold text-primary{% endif %}">2.角色设定</span>
+    <span class="{% if current_step >= 3 %}fw-bold text-primary{% endif %}">3.模型参数</span>
+    <span class="{% if current_step >= 4 %}fw-bold text-primary{% endif %}">4.世界观</span>
+    <span class="{% if current_step >= 5 %}fw-bold text-primary{% endif %}">5.预览确认</span>
+  </div>
+  <div class="progress" style="height:6px;">
+    <div class="progress-bar" role="progressbar" style="width: {{ current_step * 20 }}%;"></div>
+  </div>
+</div>
+{% endmacro %}

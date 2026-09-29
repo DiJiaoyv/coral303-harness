@@ -1,0 +1,13 @@
+<div class="col-md-4 mb-3">
+  <div class="card h-100 template-card {% if selected_id == tmpl.id %}border-primary{% endif %}"
+       style="cursor:pointer;"
+       data-template-id="{{ tmpl.id }}"
+       data-name="{{ tmpl.name }}"
+       data-description="{{ tmpl.description }}"
+       data-avatar="{{ tmpl.avatar_url }}">
+    <div class="card-body">
+      <h6 class="card-title mb-1">{{ tmpl.name }}</h6>
+      <p class="card-text small text-muted mb-0">{{ tmpl.description }}</p>
+    </div>
+  </div>
+</div>

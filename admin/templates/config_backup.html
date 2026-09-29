@@ -1,0 +1,73 @@
+{% extends "admin_base.html" %}
+{% block title %}配置备份 - Harness Admin{% endblock %}
+{% block page_title %}配置备份{% endblock %}
+
+{% block content %}
+<div class="mb-3 d-flex gap-2 flex-wrap align-items-center">
+  <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('admin.config_dashboard') }}">← 返回配置</a>
+  <form method="post" action="{{ url_for('admin.config_backup_create') }}" class="d-inline-flex gap-2 align-items-center">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="text" class="form-control form-control-sm" name="note" placeholder="备注（可选）" style="width: 12rem;">
+    <div class="form-check mb-0">
+      <input class="form-check-input" type="checkbox" name="pinned" value="1" id="pin-backup">
+      <label class="form-check-label small" for="pin-backup">保留关键备份</label>
+    </div>
+    <button type="submit" class="btn btn-primary btn-sm"
+            onclick="return confirm('创建当前配置备份？');">立即备份</button>
+  </form>
+</div>
+
+<div class="table-responsive">
+  <table class="table table-striped align-middle">
+    <thead>
+      <tr>
+        <th>时间戳 (UTC)</th>
+        <th>文件名</th>
+        <th>大小</th>
+        <th>备注</th>
+        <th>状态</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% if backups %}
+        {% for b in backups %}
+        <tr>
+          <td><code>{{ b.timestamp }}</code></td>
+          <td>{{ b.filename }}</td>
+          <td>{{ (b.size / 1024)|round(1) }} KB</td>
+          <td>{{ b.note or '—' }}</td>
+          <td>
+            {% if b.pinned %}
+            <span class="badge bg-info text-dark">已固定</span>
+            {% else %}
+            <span class="text-muted small">普通</span>
+            {% endif %}
+          </td>
+          <td class="text-nowrap">
+            <form method="post" action="{{ url_for('admin.config_backup_restore', timestamp=b.timestamp) }}" class="d-inline">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="btn btn-sm btn-warning"
+                      onclick="return confirm('确定恢复到 {{ b.timestamp }}？当前配置会先自动备份。');">恢复</button>
+            </form>
+            <form method="post" action="{{ url_for('admin.config_backup_pin', timestamp=b.timestamp) }}" class="d-inline">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <input type="hidden" name="pinned" value="{{ '0' if b.pinned else '1' }}">
+              <button type="submit" class="btn btn-sm btn-outline-secondary">
+                {{ '取消固定' if b.pinned else '固定' }}
+              </button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      {% else %}
+        <tr><td colspan="6" class="text-muted">暂无备份</td></tr>
+      {% endif %}
+    </tbody>
+  </table>
+</div>
+<p class="text-muted small">
+  最多保留最近 {{ max_backups }} 个未固定备份；已固定备份不会被自动删除。备份中的敏感字段已脱敏。
+  可通过环境变量 <code>CONFIG_MAX_BACKUPS</code> 调整上限。
+</p>
+{% endblock %}

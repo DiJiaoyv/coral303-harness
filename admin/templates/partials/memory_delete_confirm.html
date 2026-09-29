@@ -1,0 +1,24 @@
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="action" value="delete">
+        <input type="hidden" name="memory_id" id="deleteMemoryId" value="">
+        <div class="modal-header">
+          <h5 class="modal-title">确认删除</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <p>确定要删除这条记忆吗？</p>
+          <p class="text-muted small" id="deleteMemorySummary"></p>
+          <p class="small text-warning">此为软删除，管理员可在 30 天内恢复。</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+          <button type="submit" class="btn btn-danger">确认删除</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

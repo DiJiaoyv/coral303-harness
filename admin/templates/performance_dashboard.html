@@ -1,0 +1,104 @@
+{% extends "admin_base.html" %}
+{% block title %}性能监控 - Harness Admin{% endblock %}
+{% block page_title %}推理性能监控{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+  <p class="text-muted mb-0">最近 {{ minutes }} 分钟 · 共 {{ metrics.count }} 条记录</p>
+  <form method="get" class="d-flex gap-2">
+    <select name="minutes" class="form-select form-select-sm" onchange="this.form.submit()">
+      <option value="15" {% if minutes == 15 %}selected{% endif %}>近 15 分钟</option>
+      <option value="60" {% if minutes == 60 %}selected{% endif %}>近 1 小时</option>
+      <option value="360" {% if minutes == 360 %}selected{% endif %}>近 6 小时</option>
+      <option value="1440" {% if minutes == 1440 %}selected{% endif %}>近 24 小时</option>
+    </select>
+    <button type="submit" class="btn btn-sm btn-outline-primary">刷新</button>
+  </form>
+</div>
+
+{% include "partials/performance_charts.html" %}
+
+<div class="card shadow-sm">
+  <div class="card-header">最近 20 条性能日志</div>
+  <div class="table-responsive">
+    <table class="table table-hover mb-0 align-middle">
+      <thead class="table-light">
+        <tr>
+          <th>ID</th>
+          <th>时间</th>
+          <th>用户</th>
+          <th>角色</th>
+          <th>耗时(ms)</th>
+          <th>GPU%</th>
+          <th>队列</th>
+          <th>成功</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for log in metrics.recent_logs %}
+        <tr class="{% if not log.success %}table-warning{% endif %}">
+          <td>{{ log.id }}</td>
+          <td>{{ log.created_at.strftime('%m-%d %H:%M:%S') if log.created_at else '-' }}</td>
+          <td>{{ log.user_id or '-' }}</td>
+          <td>{{ log.character_id or '-' }}</td>
+          <td>{{ '%.1f'|format(log.duration_ms) }}</td>
+          <td>{{ '%.1f'|format(log.gpu_util) }}</td>
+          <td>{{ log.queue_length }}</td>
+          <td>{% if log.success %}是{% else %}否{% endif %}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="8" class="text-center text-muted py-4">暂无性能数据</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+  const data = window.performanceChartData || { labels: [], durations: [], queue: [], gpuUsed: 0, gpuIdle: 100 };
+
+  new Chart(document.getElementById('durationChart'), {
+    type: 'line',
+    data: {
+      labels: data.labels,
+      datasets: [{
+        label: '耗时 (ms)',
+        data: data.durations,
+        borderColor: '#0d6efd',
+        tension: 0.2,
+        fill: false,
+      }]
+    },
+    options: { responsive: true, scales: { y: { beginAtZero: true } } }
+  });
+
+  new Chart(document.getElementById('gpuChart'), {
+    type: 'doughnut',
+    data: {
+      labels: ['使用中', '空闲'],
+      datasets: [{
+        data: [data.gpuUsed, data.gpuIdle],
+        backgroundColor: ['#198754', '#dee2e6'],
+      }]
+    },
+    options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+  });
+
+  new Chart(document.getElementById('queueChart'), {
+    type: 'line',
+    data: {
+      labels: data.labels,
+      datasets: [{
+        label: '队列长度',
+        data: data.queue,
+        borderColor: '#fd7e14',
+        tension: 0.2,
+        fill: false,
+      }]
+    },
+    options: { responsive: true, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+  });
+</script>
+{% endblock %}

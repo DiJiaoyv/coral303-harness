@@ -1,0 +1,120 @@
+{% extends "admin_base.html" %}
+{% block title %}评分统计 - Harness Admin{% endblock %}
+{% block page_title %}对话质量评分{% endblock %}
+{% block content %}
+<div class="row g-3 mb-4">
+  <div class="col-lg-7">
+    <div class="card shadow-sm h-100">
+      <div class="card-header">总体平均分趋势（近 7 日）</div>
+      <div class="card-body">
+        <canvas id="trendChart" height="120"></canvas>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-5">
+    <div class="card shadow-sm h-100">
+      <div class="card-header">各维度平均分</div>
+      <div class="card-body">
+        <canvas id="radarChart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card shadow-sm mb-3">
+  <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <span>最近 100 条评分明细</span>
+    <form class="d-flex gap-2" method="get">
+      <select name="method" class="form-select form-select-sm" onchange="this.form.submit()">
+        <option value="" {% if not method_filter %}selected{% endif %}>全部方式</option>
+        <option value="rule" {% if method_filter == 'rule' %}selected{% endif %}>规则</option>
+        <option value="model" {% if method_filter == 'model' %}selected{% endif %}>模型</option>
+      </select>
+      <select name="sort" class="form-select form-select-sm" onchange="this.form.submit()">
+        <option value="created_at" {% if sort == 'created_at' %}selected{% endif %}>按时间</option>
+        <option value="total_score" {% if sort == 'total_score' %}selected{% endif %}>按总分</option>
+        <option value="relevance_score" {% if sort == 'relevance_score' %}selected{% endif %}>按相关性</option>
+      </select>
+      <select name="order" class="form-select form-select-sm" onchange="this.form.submit()">
+        <option value="desc" {% if order == 'desc' %}selected{% endif %}>降序</option>
+        <option value="asc" {% if order == 'asc' %}selected{% endif %}>升序</option>
+      </select>
+    </form>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-hover mb-0 align-middle">
+      <thead class="table-light">
+        <tr>
+          <th>ID</th>
+          <th>时间</th>
+          <th>总分</th>
+          <th>相关</th>
+          <th>角色</th>
+          <th>流畅</th>
+          <th>安全</th>
+          <th>方式</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in recent_scores %}
+        <tr class="{% if s.total_score < low_threshold %}table-danger{% endif %}">
+          <td>{{ s.id }}</td>
+          <td>{{ s.created_at.strftime('%m-%d %H:%M') if s.created_at else '-' }}</td>
+          <td><strong>{{ '%.2f'|format(s.total_score) }}</strong></td>
+          <td>{{ '%.1f'|format(s.relevance_score) }}</td>
+          <td>{{ '%.1f'|format(s.consistency_score) }}</td>
+          <td>{{ '%.1f'|format(s.fluency_score) }}</td>
+          <td>{{ '%.1f'|format(s.safety_score) }}</td>
+          <td>{{ s.scoring_method }}</td>
+          <td>
+            <button type="button" class="btn btn-sm btn-outline-secondary"
+                    data-bs-toggle="modal" data-bs-target="#scoreModal{{ s.id }}">详情</button>
+          </td>
+        </tr>
+        {% include "partials/score_detail_modal.html" %}
+        {% else %}
+        <tr><td colspan="9" class="text-center text-muted py-4">暂无评分数据</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+<p class="text-muted small">低分阈值：{{ low_threshold }} 分以下标红。评分数据不对普通用户展示。</p>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+  new Chart(document.getElementById('trendChart'), {
+    type: 'line',
+    data: {
+      labels: {{ trend_labels | tojson }},
+      datasets: [{
+        label: '平均总分',
+        data: {{ trend_values | tojson }},
+        borderColor: '#0d6efd',
+        tension: 0.3,
+        fill: false
+      }]
+    },
+    options: { scales: { y: { min: 0, max: 10 } } }
+  });
+
+  new Chart(document.getElementById('radarChart'), {
+    type: 'radar',
+    data: {
+      labels: ['相关性', '角色一致性', '流畅度', '安全性'],
+      datasets: [{
+        label: '平均分',
+        data: {{ radar_values | tojson }},
+        borderColor: '#198754',
+        backgroundColor: 'rgba(25, 135, 84, 0.2)'
+      }]
+    },
+    options: {
+      scales: { r: { min: 0, max: 10, ticks: { stepSize: 2 } } }
+    }
+  });
+</script>
+{% endblock %}

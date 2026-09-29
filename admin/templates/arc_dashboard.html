@@ -1,0 +1,162 @@
+{% extends "admin_base.html" %}
+{% block title %}弧光管理 - {{ character.display_name }}{% endblock %}
+{% block page_title %}弧光：{{ character.display_name }}{% endblock %}
+{% block content %}
+<div class="mb-3">
+  <a href="{{ url_for('admin.characters_list') }}" class="btn btn-sm btn-outline-secondary">← 返回角色列表</a>
+  <a href="{{ url_for('admin.character_edit', character_id=character.id) }}" class="btn btn-sm btn-outline-primary">编辑角色元数据</a>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-8">
+    <div class="card shadow-sm mb-3">
+      <div class="card-header">阶段进度</div>
+      <div class="card-body">
+        {{ progress_html|safe }}
+        <div class="d-flex justify-content-between small text-muted">
+          <span>当前：{{ stage_labels.get(arc_state.current_stage, arc_state.current_stage) }}</span>
+          <span>总进度 {{ (arc_state.progress * 100)|round(1) }}%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card shadow-sm mb-3">
+      <div class="card-header">手动修改阶段</div>
+      <div class="card-body">
+        <form method="post" class="row g-2 align-items-end">
+          {{ stage_form.hidden_tag() }}
+          <input type="hidden" name="action" value="update_stage">
+          <div class="col-md-6">
+            {{ stage_form.new_stage.label(class="form-label") }}
+            {{ stage_form.new_stage(class="form-select") }}
+          </div>
+          <div class="col-md-4">
+            {{ stage_form.submit(class="btn btn-primary") }}
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="card shadow-sm mb-3">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span>目标列表</span>
+        <span class="badge bg-secondary">{{ arc_state.goals|length }} 项</span>
+      </div>
+      <div class="card-body p-0">
+        {% if arc_state.goals %}
+        <div class="list-group list-group-flush">
+          {% for goal in arc_state.goals %}
+          <div class="list-group-item">
+            <div class="d-flex justify-content-between align-items-start gap-2">
+              <div class="{% if goal.completed %}text-decoration-line-through text-muted{% endif %}">
+                <strong>{{ goal.title }}</strong>
+                {% if goal.description %}
+                <div class="small text-muted">{{ goal.description }}</div>
+                {% endif %}
+              </div>
+              <div class="btn-group btn-group-sm">
+                <form method="post" class="d-inline">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <input type="hidden" name="action" value="toggle_goal">
+                  <input type="hidden" name="goal_id" value="{{ goal.id }}">
+                  <input type="hidden" name="completed" value="{{ 0 if goal.completed else 1 }}">
+                  <button type="submit" class="btn btn-outline-success btn-sm">
+                    {{ '取消完成' if goal.completed else '标记完成' }}
+                  </button>
+                </form>
+                <button type="button" class="btn btn-outline-secondary btn-sm"
+                        data-bs-toggle="modal" data-bs-target="#editGoalModal"
+                        data-goal-id="{{ goal.id }}"
+                        data-goal-title="{{ goal.title }}"
+                        data-goal-desc="{{ goal.description }}">
+                  编辑
+                </button>
+                <form method="post" class="d-inline" onsubmit="return confirm('确定删除该目标？');">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <input type="hidden" name="action" value="delete_goal">
+                  <input type="hidden" name="goal_id" value="{{ goal.id }}">
+                  <button type="submit" class="btn btn-outline-danger btn-sm">删除</button>
+                </form>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-muted p-3 mb-0">暂无目标，请在下方添加。</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="card shadow-sm mb-3">
+      <div class="card-header">添加目标</div>
+      <div class="card-body">
+        <form method="post">
+          {{ goal_form.hidden_tag() }}
+          <input type="hidden" name="action" value="add_goal">
+          <div class="mb-3">
+            {{ goal_form.title.label(class="form-label") }}
+            {{ goal_form.title(class="form-control") }}
+          </div>
+          <div class="mb-3">
+            {{ goal_form.description.label(class="form-label") }}
+            {{ goal_form.description(class="form-control", rows=3) }}
+          </div>
+          {{ goal_form.submit(class="btn btn-primary") }}
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card shadow-sm mb-3">
+      <div class="card-header">自动推进</div>
+      <div class="card-body">
+        <form method="post">
+          {{ auto_form.hidden_tag() }}
+          <input type="hidden" name="action" value="auto_advance">
+          <div class="form-check form-switch mb-3">
+            {{ auto_form.auto_advance(class="form-check-input") }}
+            {{ auto_form.auto_advance.label(class="form-check-label") }}
+          </div>
+          <p class="small text-muted">关闭后，引擎不会自动推进弧光阶段。</p>
+          {{ auto_form.submit(class="btn btn-outline-primary btn-sm") }}
+        </form>
+      </div>
+    </div>
+
+    <div class="card shadow-sm">
+      <div class="card-header">操作日志（最近 {{ logs|length }} 条）</div>
+      <div class="card-body p-0" style="max-height:480px;overflow-y:auto;">
+        {% if logs %}
+        <ul class="list-group list-group-flush small">
+          {% for log in logs %}
+          <li class="list-group-item">
+            <div class="fw-semibold">{{ log.action }} · {{ log.operator }}</div>
+            <div class="text-muted">{{ log.created_at }}</div>
+            <div class="text-break">{{ log.details }}</div>
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <p class="text-muted p-3 mb-0">暂无日志</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% include "partials/arc_edit_modal.html" %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('editGoalModal')?.addEventListener('show.bs.modal', function (event) {
+  const btn = event.relatedTarget;
+  if (!btn) return;
+  document.getElementById('edit-goal-id').value = btn.getAttribute('data-goal-id') || '';
+  document.getElementById('edit-goal-title').value = btn.getAttribute('data-goal-title') || '';
+  document.getElementById('edit-goal-desc').value = btn.getAttribute('data-goal-desc') || '';
+});
+</script>
+{% endblock %}

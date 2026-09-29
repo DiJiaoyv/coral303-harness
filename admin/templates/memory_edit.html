@@ -1,0 +1,35 @@
+{% extends "admin_base.html" if is_admin_view else "memory_user_base.html" %}
+{% block title %}编辑记忆 - {{ character.display_name if character else '' }}{% endblock %}
+{% block page_title %}编辑记忆{% endblock %}
+{% block content %}
+<div class="mb-3">
+  <a href="{{ url_for(list_endpoint, character_id=character_id) }}" class="btn btn-sm btn-outline-secondary">← 返回列表</a>
+</div>
+<div class="card shadow-sm" style="max-width:720px;">
+  <div class="card-body">
+    <form method="post">
+      {{ form.hidden_tag() }}
+      <div class="mb-3">
+        {{ form.content.label(class="form-label") }}
+        {{ form.content(class="form-control", rows=8) }}
+        {% for e in form.content.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+      </div>
+      <div class="mb-3">
+        {{ form.importance.label(class="form-label") }}
+        {{ form.importance(class="form-select") }}
+      </div>
+      <div class="mb-3">
+        <label class="form-label">来源（只读）</label>
+        <input type="text" class="form-control" readonly value="{{ memory.source }}">
+      </div>
+      {% if memory.embedding_preview %}
+      <div class="mb-3">
+        <label class="form-label">向量预览</label>
+        <input type="text" class="form-control form-control-sm" readonly value="{{ memory.embedding_preview }}">
+      </div>
+      {% endif %}
+      {{ form.submit(class="btn btn-primary") }}
+    </form>
+  </div>
+</div>
+{% endblock %}

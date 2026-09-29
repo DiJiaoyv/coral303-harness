@@ -1,0 +1,18 @@
+{
+  "active": "幽灵",
+  "base_dir": "characters",
+  "characters": {
+    "幽灵": {
+      "name": "幽灵",
+      "role": "星际赏金猎人"
+    },
+    "老K": {
+      "name": "老K",
+      "role": "空间站军火商"
+    },
+    "喵小星": {
+      "name": "喵小星",
+      "role": "低重力星球的小猫"
+    }
+  }
+}

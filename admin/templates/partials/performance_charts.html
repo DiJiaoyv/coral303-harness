@@ -1,0 +1,78 @@
+<div class="row g-3 mb-4">
+  <div class="col-md-3">
+    <div class="card shadow-sm h-100">
+      <div class="card-body">
+        <div class="text-muted small">平均耗时</div>
+        <div class="fs-4 fw-bold">{{ metrics.avg_duration_ms }} ms</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card shadow-sm h-100">
+      <div class="card-body">
+        <div class="text-muted small">P95 耗时</div>
+        <div class="fs-4 fw-bold">{{ metrics.p95_duration_ms }} ms</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card shadow-sm h-100">
+      <div class="card-body">
+        <div class="text-muted small">当前队列长度</div>
+        <div class="fs-4 fw-bold">{{ metrics.current_queue_length }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card shadow-sm h-100">
+      <div class="card-body">
+        <div class="text-muted small">成功率</div>
+        <div class="fs-4 fw-bold">{{ metrics.success_rate }}%</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-lg-8">
+    <div class="card shadow-sm h-100">
+      <div class="card-header">请求耗时趋势（最近 100 条）</div>
+      <div class="card-body">
+        <canvas id="durationChart" height="120"></canvas>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="card shadow-sm h-100">
+      <div class="card-header">GPU 利用率</div>
+      <div class="card-body">
+        <canvas id="gpuChart"></canvas>
+        <p class="small text-muted mt-2 mb-0">
+          {% if metrics.gpu_info.available %}
+          设备：{{ metrics.gpu_info.name }}（#{{ metrics.gpu_info.device_index }}）<br>
+          显存：{{ '%.0f'|format(metrics.gpu_info.memory_used_mb) }} / {{ '%.0f'|format(metrics.gpu_info.memory_total_mb) }} MB
+          {% else %}
+          未检测到可用 GPU，当前为 CPU 模式
+          {% endif %}
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card shadow-sm mb-4">
+  <div class="card-header">队列长度时序</div>
+  <div class="card-body">
+    <canvas id="queueChart" height="80"></canvas>
+  </div>
+</div>
+
+<script>
+  window.performanceChartData = {
+    labels: {{ metrics.chart_labels | tojson }},
+    durations: {{ metrics.chart_durations | tojson }},
+    queue: {{ metrics.chart_queue | tojson }},
+    gpuUsed: {{ metrics.current_gpu_util | tojson }},
+    gpuIdle: {{ (100 - metrics.current_gpu_util) | tojson }}
+  };
+</script>

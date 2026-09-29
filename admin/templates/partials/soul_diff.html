@@ -1,0 +1,21 @@
+{% if diff_rows %}
+<div class="card border-warning mb-3">
+  <div class="card-header bg-warning-subtle">变更对比</div>
+  <div class="card-body p-0">
+    <table class="table table-sm mb-0">
+      <thead>
+        <tr><th>字段</th><th>旧值</th><th>新值</th></tr>
+      </thead>
+      <tbody>
+        {% for row in diff_rows %}
+        <tr>
+          <td><code>{{ row.field }}</code></td>
+          <td class="text-muted">{{ row.old }}</td>
+          <td class="fw-semibold">{{ row.new }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}

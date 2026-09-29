@@ -1,0 +1,71 @@
+{% set item = item %}
+{% set field_id = 'cfg_' ~ item.key %}
+{% set typ = item.type %}
+{% set val = item.value %}
+<div class="mb-3 config-field"
+     data-key="{{ item.key }}"
+     data-type="{{ typ }}"
+     data-sensitive="{{ '1' if item.sensitive else '0' }}"
+     data-effective="{{ item.effective }}"
+     {% if item.depends_on %}data-depends-on="{{ item.depends_on|join(',') }}"{% endif %}
+     {% if item.depends_hint %}data-depends-hint="{{ item.depends_hint }}"{% endif %}>
+  <label class="form-label" for="{{ field_id }}">
+    {{ item.label }}
+    <code class="text-muted small ms-1">{{ item.key }}</code>
+    {% if item.sensitive %}<span class="badge bg-warning text-dark">敏感</span>{% endif %}
+    {% if item.effective == 'require_restart' %}
+    <span class="badge bg-secondary ms-1" title="修改后需重启服务才能生效" data-bs-toggle="tooltip">
+      <span aria-hidden="true">🔄</span> 需重启
+    </span>
+    {% endif %}
+  </label>
+
+  {% if typ == 'bool' %}
+  <div class="form-check form-switch">
+    <input class="form-check-input config-input" type="checkbox" role="switch"
+           id="{{ field_id }}" name="{{ item.key }}"
+           {% if val %}checked{% endif %}>
+  </div>
+
+  {% elif typ == 'enum' %}
+  <select class="form-select config-input" id="{{ field_id }}" name="{{ item.key }}">
+    {% for opt in item.options %}
+    <option value="{{ opt }}" {% if val == opt %}selected{% endif %}>{{ opt }}</option>
+    {% endfor %}
+  </select>
+
+  {% elif typ == 'int' or typ == 'float' %}
+  <div class="row g-2 align-items-center">
+    <div class="col-md-8">
+      <input type="range" class="form-range config-range"
+             min="{{ item.min if item.min is defined else 0 }}"
+             max="{{ item.max if item.max is defined else 100 }}"
+             step="{{ item.step if item.step is defined else (1 if typ == 'int' else 0.1) }}"
+             value="{{ val }}"
+             data-target="{{ field_id }}">
+    </div>
+    <div class="col-md-4">
+      <input type="number" class="form-control config-input" id="{{ field_id }}" name="{{ item.key }}"
+             value="{{ val }}"
+             {% if item.min is defined %}min="{{ item.min }}"{% endif %}
+             {% if item.max is defined %}max="{{ item.max }}"{% endif %}
+             step="{{ item.step if item.step is defined else (1 if typ == 'int' else 0.1) }}">
+    </div>
+  </div>
+
+  {% else %}
+  <input type="{% if item.sensitive %}password{% else %}text{% endif %}"
+         class="form-control config-input" id="{{ field_id }}" name="{{ item.key }}"
+         value="{{ val }}"
+         {% if item.max_length %}maxlength="{{ item.max_length }}"{% endif %}
+         autocomplete="off"
+         {% if item.sensitive %}placeholder="留空或 ****** 表示不修改"{% endif %}>
+  {% endif %}
+
+  {% if item.help %}
+  <div class="form-text">{{ item.help }}</div>
+  {% endif %}
+  <div class="form-text text-muted">来源: {{ item.source }} · 模块: {{ item.module }}</div>
+  <div class="depends-warning alert alert-warning py-1 px-2 small d-none mt-1 mb-0" role="alert"></div>
+  <div class="invalid-feedback d-block field-error" style="display:none !important;"></div>
+</div>

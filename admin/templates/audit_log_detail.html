@@ -1,0 +1,48 @@
+{% extends "admin_base.html" %}
+{% block title %}审核详情 #{{ record.id }} - Harness Admin{% endblock %}
+{% block page_title %}审核记录详情 #{{ record.id }}{% endblock %}
+{% block content %}
+<div class="mb-3">
+  <a href="{{ url_for('admin.safety_dashboard') }}" class="btn btn-sm btn-outline-secondary">返回列表</a>
+</div>
+
+<div class="card shadow-sm mb-3">
+  <div class="card-body">
+    <dl class="row mb-0">
+      <dt class="col-sm-2">时间</dt>
+      <dd class="col-sm-10">{{ record.created_at.strftime('%Y-%m-%d %H:%M:%S') if record.created_at else '-' }}</dd>
+      <dt class="col-sm-2">阶段</dt>
+      <dd class="col-sm-10">{{ record.stage }}</dd>
+      <dt class="col-sm-2">级别</dt>
+      <dd class="col-sm-10">{{ record.level }}</dd>
+      <dt class="col-sm-2">命中词</dt>
+      <dd class="col-sm-10"><code>{{ record.matched_word }}</code></dd>
+      <dt class="col-sm-2">动作</dt>
+      <dd class="col-sm-10">{{ record.action_taken }}</dd>
+      <dt class="col-sm-2">用户 ID</dt>
+      <dd class="col-sm-10">{{ record.user_id or '-' }}</dd>
+      <dt class="col-sm-2">角色 ID</dt>
+      <dd class="col-sm-10">{{ record.character_id or '-' }}</dd>
+    </dl>
+  </div>
+</div>
+
+<div class="card shadow-sm">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <span>原始内容（仅管理员）</span>
+    {% if not reveal %}
+    <form method="post" action="{{ url_for('admin.safety_reveal', log_id=record.id) }}"
+          onsubmit="return confirm('确定查看该条审核记录的原文？此操作将被记录。');">
+      <button type="submit" class="btn btn-sm btn-warning">查看原文</button>
+    </form>
+    {% endif %}
+  </div>
+  <div class="card-body">
+    {% if reveal %}
+    <pre class="mb-0" style="white-space: pre-wrap;">{{ record.original_content }}</pre>
+    {% else %}
+    <p class="text-muted mb-0">原文已隐藏。点击「查看原文」并确认后可显示。</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

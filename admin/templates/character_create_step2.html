@@ -1,0 +1,31 @@
+{% extends "admin_base.html" if is_admin_view else "memory_user_base.html" %}
+{% from "partials/wizard_progress.html" import wizard_progress %}
+{% block title %}创建角色 · 角色设定{% endblock %}
+{% block page_title %}创建角色向导{% endblock %}
+{% block content %}
+{{ wizard_progress(current_step) }}
+<div class="card shadow-sm">
+  <div class="card-header">第二步：角色设定</div>
+  <div class="card-body">
+    <form method="post">
+      {{ form.hidden_tag() }}
+      <div class="mb-3">
+        {{ form.system_prompt.label(class="form-label") }}
+        {{ form.system_prompt(class="form-control", rows=10) }}
+        {% for e in form.system_prompt.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+        <div class="form-text">定义角色身份、语气与行为边界，不超过 8192 字符</div>
+      </div>
+      <div class="mb-3">
+        {{ form.style_tags.label(class="form-label") }}
+        {{ form.style_tags(class="form-control", placeholder="冷酷,简洁,寡言") }}
+        {% for e in form.style_tags.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+        <div class="form-text">逗号分隔的风格标签</div>
+      </div>
+      <div class="d-flex gap-2">
+        {{ form.back_btn(class="btn btn-outline-secondary") }}
+        {{ form.next_btn(class="btn btn-primary") }}
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

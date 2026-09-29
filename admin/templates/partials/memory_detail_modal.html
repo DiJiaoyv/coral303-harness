@@ -1,0 +1,24 @@
+<div class="modal fade" id="memModal{{ loop.index }}" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">记忆详情</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <dl class="row small">
+          <dt class="col-sm-2">重要性</dt>
+          <dd class="col-sm-4">{{ importance_labels[m.importance] }} ({{ m.importance_raw }}/5)</dd>
+          <dt class="col-sm-2">来源</dt>
+          <dd class="col-sm-4">{{ source_labels.get(m.source, m.source) }}</dd>
+          <dt class="col-sm-2">创建</dt>
+          <dd class="col-sm-4">{{ m.created_at }}</dd>
+          <dt class="col-sm-2">更新</dt>
+          <dd class="col-sm-4">{{ m.updated_at }}</dd>
+        </dl>
+        <h6>完整内容</h6>
+        <pre class="bg-light p-3 rounded small mb-0">{{ m.content }}</pre>
+      </div>
+    </div>
+  </div>
+</div>

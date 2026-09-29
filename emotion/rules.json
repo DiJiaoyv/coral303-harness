@@ -1,0 +1,54 @@
+{
+  "version": 1,
+  "behaviors": [
+    {
+      "id": "praise",
+      "label": "夸奖",
+      "keywords": ["你好棒", "厉害", "喜欢", "真棒", "太好了", "佩服"],
+      "patterns": ["真(的)?(棒|厉害|不错)", "好(棒|厉害|优秀)"],
+      "offset": {"pleasure": 0.2, "arousal": 0.1, "dominance": 0.1}
+    },
+    {
+      "id": "criticism",
+      "label": "批评",
+      "keywords": ["你真笨", "讨厌", "差劲", "无聊", "废物", "滚"],
+      "patterns": ["真(笨|差|烂)", "不(喜欢|想理)"],
+      "offset": {"pleasure": -0.3, "arousal": 0.2, "dominance": -0.1}
+    },
+    {
+      "id": "share_secret",
+      "label": "分享秘密",
+      "keywords": ["告诉你一个秘密", "其实我", "从没跟别人说过", "只告诉你"],
+      "patterns": ["秘密", "坦白说", "说实话"],
+      "offset": {"pleasure": 0.1, "arousal": -0.1, "dominance": 0.3}
+    },
+    {
+      "id": "comfort",
+      "label": "安慰",
+      "keywords": ["别难过", "没事的", "加油", "别担心", "会好的"],
+      "patterns": ["别(难过|伤心|哭)", "没关系的"],
+      "offset": {"pleasure": 0.3, "arousal": -0.2, "dominance": 0.1}
+    },
+    {
+      "id": "provocation",
+      "label": "挑衅",
+      "keywords": ["你敢吗", "来啊", "不服", "有本事", "试试看"],
+      "patterns": ["敢不(敢|要)", "来(战|打)"],
+      "offset": {"pleasure": -0.1, "arousal": 0.4, "dominance": 0.2}
+    },
+    {
+      "id": "indifference",
+      "label": "冷漠",
+      "keywords": ["哦", "知道了", "随便", "无所谓", "嗯", "好吧"],
+      "patterns": ["^(哦|嗯|好|行)[。！？…]*$"],
+      "offset": {"pleasure": -0.1, "arousal": -0.2, "dominance": -0.1}
+    },
+    {
+      "id": "farewell",
+      "label": "告别",
+      "keywords": ["再见", "拜拜", "我先走了", "下次聊", "回见"],
+      "patterns": ["再(见|会)", "先走了"],
+      "offset": {"pleasure": -0.1, "arousal": -0.3, "dominance": 0.0}
+    }
+  ]
+}

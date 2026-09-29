@@ -1,0 +1,40 @@
+{% extends "admin_base.html" if is_admin_view else "memory_user_base.html" %}
+{% from "partials/wizard_progress.html" import wizard_progress %}
+{% block title %}创建角色 · 预览确认{% endblock %}
+{% block page_title %}创建角色向导{% endblock %}
+{% block content %}
+{{ wizard_progress(current_step) }}
+{% set s1 = wizard_data.step1 %}
+{% set s2 = wizard_data.step2 %}
+{% set s3 = wizard_data.step3 %}
+{% set s4 = wizard_data.step4 %}
+
+<div class="card shadow-sm mb-3">
+  <div class="card-header">角色预览</div>
+  <div class="card-body">
+    <h4 class="mb-1">{{ s1.name }}</h4>
+    <p class="text-muted">{{ s1.description or '（无描述）' }}</p>
+    {% if s1.avatar_url %}
+    <p class="small"><strong>头像：</strong> {{ s1.avatar_url }}</p>
+    {% endif %}
+    <hr>
+    <p><strong>风格标签：</strong> {{ s2.style_tags or '（无）' }}</p>
+    <p><strong>世界观：</strong> {{ world_name }}</p>
+    <p><strong>Temperature / Max Tokens / Top P：</strong>
+      {{ s3.temperature }} / {{ s3.max_tokens }} / {{ s3.top_p }}
+    </p>
+    <div class="mt-3">
+      <strong>系统提示词</strong>
+      <pre class="bg-light p-3 rounded small" style="white-space:pre-wrap;">{{ s2.system_prompt }}</pre>
+    </div>
+  </div>
+</div>
+
+<form method="post">
+  {{ form.hidden_tag() }}
+  <div class="d-flex gap-2">
+    {{ form.back_btn(class="btn btn-outline-secondary") }}
+    {{ form.confirm_btn(class="btn btn-success") }}
+  </div>
+</form>
+{% endblock %}

@@ -1,0 +1,26 @@
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="card shadow-sm h-100 border-danger">
+      <div class="card-body">
+        <div class="text-muted small">今日拦截</div>
+        <div class="fs-3 fw-bold text-danger">{{ today_blocked }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-8">
+    <div class="card shadow-sm h-100">
+      <div class="card-header">近 7 日违规趋势</div>
+      <div class="card-body">
+        <canvas id="safetyTrendChart" height="100"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  window.safetyChartData = {
+    labels: {{ trend_labels | tojson }},
+    blocked: {{ trend_blocked | tojson }},
+    total: {{ trend_total | tojson }}
+  };
+</script>

@@ -1,0 +1,41 @@
+# 白名单模式：项目根目录是用户主目录，默认忽略一切，只打包 Harness 代码
+**
+
+# 构建与依赖
+!Dockerfile
+!docker-compose.yml
+!requirements.txt
+!config.json
+!.env.example
+
+# 根目录 Python 入口与核心模块
+!*.py
+
+# 业务包
+!app/
+!app/**
+!admin/
+!admin/**
+!api/
+!api/**
+!database/
+!database/**
+!deploy/
+!deploy/**
+!memory/
+!memory/**
+!scoring/
+!scoring/**
+!scripts/
+!scripts/**
+
+# 角色数据（运行时也可由卷挂载）
+!characters/
+!characters/**
+!characters.json
+
+# 模板与静态资源（若存在）
+!templates/
+!templates/**
+!static/
+!static/**

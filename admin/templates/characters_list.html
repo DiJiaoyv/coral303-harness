@@ -1,0 +1,49 @@
+{% extends "admin_base.html" %}
+{% block title %}角色管理 - Harness Admin{% endblock %}
+{% block page_title %}角色管理{% endblock %}
+{% block content %}
+<div class="mb-3">
+  <a href="{{ url_for('admin.wizard_step1', reset=1) }}" class="btn btn-primary">+ 创建角色向导</a>
+  <a href="{{ url_for('admin.character_create') }}" class="btn btn-outline-secondary">快速创建</a>
+</div>
+<div class="card shadow-sm">
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>ID</th>
+          <th>名称</th>
+          <th>定位</th>
+          <th>所属用户</th>
+          <th>更新时间</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in characters %}
+        <tr>
+          <td>{{ c.id }}</td>
+          <td>{{ c.display_name }}</td>
+          <td>{{ c.role or '-' }}</td>
+          <td>{{ c.owner.username if c.owner else c.user_id }}</td>
+          <td>{{ c.updated_at.strftime('%Y-%m-%d %H:%M') if c.updated_at else '-' }}</td>
+          <td>
+            <a class="btn btn-sm btn-outline-primary" href="{{ url_for('admin.character_edit', character_id=c.id) }}">编辑</a>
+            <a class="btn btn-sm btn-outline-danger" href="{{ url_for('admin.soul_core_edit', character_id=c.id) }}">核心</a>
+            <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('admin.soul_state_edit', character_id=c.id) }}">状态</a>
+            <a class="btn btn-sm btn-outline-info" href="{{ url_for('admin.arc_dashboard', character_id=c.id) }}">弧光</a>
+            <form class="d-inline" method="post" action="{{ url_for('admin.character_delete', character_id=c.id) }}"
+                  onsubmit="return confirm('确定删除角色「{{ c.display_name }}」？此操作为软删除，可恢复。');">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="btn btn-sm btn-outline-danger">删除</button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6" class="text-center text-muted py-4">暂无角色</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

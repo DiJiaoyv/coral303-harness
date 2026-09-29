@@ -1,0 +1,106 @@
+# Harness Docker Compose 编排
+# 用法: docker compose up -d --build
+
+services:
+  web:
+    build:
+      context: .docker-build
+      dockerfile: Dockerfile
+    image: harness-engine:latest
+    command: ["web"]
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      HARNESS_DATA_DIR: /app/data
+      FLASK_ENV: production
+      DEBUG: "false"
+    volumes:
+      - harness-data:/app/data
+    networks:
+      - harness-internal
+    expose:
+      - "7860"
+    healthcheck:
+      test: ["CMD", "python", "/app/deploy/healthcheck.py"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  api:
+    build:
+      context: .docker-build
+      dockerfile: Dockerfile
+    image: harness-engine:latest
+    command: ["api"]
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      HARNESS_DATA_DIR: /app/data
+    volumes:
+      - harness-data:/app/data
+    networks:
+      - harness-internal
+    expose:
+      - "8000"
+    depends_on:
+      web:
+        condition: service_healthy
+
+  nginx:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      # 生产环境启用 HTTPS 时取消下一行注释，并挂载证书
+      # - "443:443"
+    volumes:
+      - ./deploy/nginx.http.conf:/etc/nginx/nginx.conf:ro
+      # 生产 SSL: 替换为 deploy/nginx.conf 并挂载证书目录
+      # - ./deploy/nginx.conf:/etc/nginx/nginx.conf:ro
+      # - ./deploy/certs:/etc/nginx/certs:ro
+    depends_on:
+      web:
+        condition: service_healthy
+      api:
+        condition: service_started
+    networks:
+      - harness-internal
+
+  # ---------- 可选 PostgreSQL（高并发生产环境）----------
+  # postgres:
+  #   image: postgres:16-alpine
+  #   restart: unless-stopped
+  #   environment:
+  #     POSTGRES_USER: ${POSTGRES_USER:-harness}
+  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+  #     POSTGRES_DB: ${POSTGRES_DB:-harness}
+  #   volumes:
+  #     - postgres-data:/var/lib/postgresql/data
+  #   networks:
+  #     - harness-internal
+  #   # 不暴露端口到宿主机（仅内部网络访问）
+
+  # ---------- 可选 Redis 缓存 ----------
+  # redis:
+  #   image: redis:7-alpine
+  #   restart: unless-stopped
+  #   command: redis-server --appendonly yes
+  #   volumes:
+  #     - redis-data:/data
+  #   networks:
+  #     - harness-internal
+
+volumes:
+  harness-data:
+    driver: local
+  # postgres-data:
+  # redis-data:
+
+networks:
+  harness-internal:
+    driver: bridge

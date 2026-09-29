@@ -1,0 +1,58 @@
+{
+  "paths": {
+    "soul": "soul_state.json",
+    "memory": "memory_state.json",
+    "emotion": "emotion_state.json",
+    "log_session": "logs/session_{session_id}.json"
+  },
+  "ollama": {
+    "chat_model": "qwen2.5:7b",
+    "analysis_model": "qwen2.5:7b",
+    "base_url": "http://localhost:11434/api/generate",
+    "timeout": 300,
+    "num_predict": 200,
+    "max_retries": 2
+  },
+  "engine": {
+    "stream": true,
+    "fact_extract_interval": 3,
+    "arc_update_interval": 3,
+    "auto_save_interval": 5,
+    "memory_max_rounds": 10,
+    "recent_dialogue_rounds": 5,
+    "relevant_facts_limit": 3,
+    "hot_reload": true
+  },
+  "memory_extractor": {
+    "num_predict": 150,
+    "temperature": 0.3
+  },
+  "arc_updater": {
+    "num_predict": 120,
+    "temperature": 0.2
+  },
+  "emotion": {
+    "default_score": 5.0
+  },
+  "unified_analyzer": {
+    "enabled": true,
+    "num_predict": 250,
+    "temperature": 0.25
+  },
+  "web": {
+    "host": "127.0.0.1",
+    "port": 7860,
+    "share": false,
+    "theme": "soft"
+  },
+  "embeddings": {
+    "enabled": true,
+    "model": "nomic-embed-text",
+    "base_url": "http://localhost:11434/api/embeddings",
+    "timeout": 60,
+    "max_retries": 2
+  },
+  "characters": {
+    "registry": "characters.json"
+  }
+}
