@@ -1,17 +1,26 @@
 # Harness
 
-## Coral303
+<p align="center">
+<img src="docs/images/logo.png" width="220">
+</p>
 
+<h2 align="center">Coral303</h2>
+
+<p align="center">
 A Persistent AI Character Harness for building long-lived AI characters with memory, personality continuity, emotional states, and evolving relationships.
+</p>
+
 
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 
 
-## Overview
+---
+
+# Overview
 
 Harness (Coral303) is a persistent AI character runtime framework designed to create long-lived AI beings with continuous identity, memory, emotional states, and relationship evolution.
 
-Unlike traditional chatbot systems that treat each conversation as an isolated interaction, Harness introduces a structured runtime layer between users and Large Language Models (LLMs).
+Unlike traditional chatbot systems that treat every conversation as an isolated interaction, Harness introduces a structured runtime layer between users and Large Language Models (LLMs).
 
 The system maintains:
 
@@ -34,7 +43,9 @@ The goal is to provide an engineering foundation for persistent AI characters th
 
 ## Harness Engine
 
-The core runtime engine coordinates the complete interaction lifecycle:
+Harness Engine is the central runtime controller of the system.
+
+It coordinates:
 
 - Request orchestration
 - Context construction
@@ -42,17 +53,18 @@ The core runtime engine coordinates the complete interaction lifecycle:
 - Memory integration
 - LLM generation
 - Post-processing
-- Logging and evaluation
+- Logging
+- Evaluation
 
 
-Main components:
+Core components:
 
-
+```
 orchestrator.py
 harness_core.py
 context_builder.py
 memory_writer.py
-
+```
 
 
 ---
@@ -72,9 +84,9 @@ It manages:
 
 Directory:
 
-
+```
 soul/
-
+```
 
 
 ---
@@ -83,7 +95,6 @@ soul/
 
 Harness provides multi-layer memory management.
 
-Supported memory layers:
 
 ## Short-term Memory
 
@@ -96,15 +107,15 @@ Includes:
 
 - Raw memory
 - Semantic memory
-- Retrieval
+- Retrieval system
 - Embedding-based similarity search
 
 
 Directory:
 
-
+```
 memory/
-
+```
 
 
 ---
@@ -124,9 +135,9 @@ Features:
 
 Directory:
 
-
+```
 emotion/
-
+```
 
 
 ---
@@ -144,9 +155,9 @@ Includes:
 
 Directory:
 
-
+```
 relationship/
-
+```
 
 
 ---
@@ -164,9 +175,9 @@ It tracks:
 
 Directory:
 
-
+```
 arc/
-
+```
 
 
 ---
@@ -185,38 +196,40 @@ Includes:
 
 Directory:
 
-
+```
 safety/
-
+```
 
 
 ---
 
 # Architecture
 
-
 Harness follows a five-layer architecture:
 
 
+![Harness Architecture](docs/images/architecture.png)
 
+
+```
 Interaction Layer
 
-    ↓
+        ↓
 
 Control Layer
 
-    ↓
+        ↓
 
 Cognition Layer
 
-    ↓
+        ↓
 
 Execution Layer
 
-    ↓
+        ↓
 
 Persistence Layer
-
+```
 
 
 ## Interaction Layer
@@ -263,15 +276,26 @@ Data storage:
 - SQLite
 - Character states
 - Memory states
-- Logs
+- Session logs
 
 
 ---
 
 # Web Interface
 
-
 Harness provides a Flask-based Web UI.
+
+## Login Interface
+
+
+![Harness Login](docs/images/web_login.png)
+
+
+## Dashboard
+
+
+![Harness Dashboard](docs/images/web_dashboard.png)
+
 
 Features:
 
@@ -286,136 +310,261 @@ Run:
 
 ```bash
 python web_ui.py run
+```
+
 
 Open:
 
+```
 http://127.0.0.1:7860
-Installation
-Requirements
+```
+
+
+---
+
+# Installation
+
+
+## Requirements
 
 Recommended:
 
+```
 Python 3.12
+```
 
 Supported:
 
+```
 Python >=3.11
+```
+
 
 Install dependencies:
 
+```bash
 pip install -r requirements.txt
-LLM Backend
+```
+
+
+---
+
+# LLM Backend
+
 
 Harness supports multiple LLM backends.
 
-DeepSeek Cloud API
 
-Used for evaluation experiments.
+## DeepSeek Cloud API
 
-Model:
+The evaluation experiments use:
 
+```
 deepseek-chat
+```
 
-Endpoint:
 
+API endpoint:
+
+```
 https://api.deepseek.com/v1/chat/completions
-Ollama
+```
+
+
+Experiment configuration:
+
+```
+temperature = 0.7
+```
+
+
+## Ollama
 
 Local inference backend is also supported.
 
-Quick Start
 
-Clone:
+---
 
+# Quick Start
+
+
+Clone repository:
+
+```bash
 git clone https://github.com/DiJiaoyv/coral303-harness.git
+```
+
 
 Enter project:
 
+```bash
 cd coral303-harness
+```
+
 
 Install:
 
+```bash
 pip install -r requirements.txt
+```
+
 
 Configure environment variables:
 
+```
 DEEPSEEK_API_KEY=your_key
+```
+
 
 Run:
 
+```bash
 python web_ui.py run
+```
+
 
 Open:
 
+```
 http://127.0.0.1:7860
-Evaluation
-100-Round Character Drift Test
+```
+
+
+---
+
+# Evaluation
+
+
+## 100-Round Character Drift Test
+
 
 The evaluation measures whether an AI character can maintain consistency during long-term interaction.
 
-Experiment setup:
+
+## Experimental Setup
+
 
 Model:
 
+```
 DeepSeek-chat
+```
+
 
 Temperature:
 
+```
 0.7
+```
 
-Comparison:
 
-Baseline LLM
+---
+
+## Baseline LLM
+
+
+Definition:
+
+```
 DeepSeek-chat
 
 +
+
 Kaspar character system prompt
 
 +
+
 Full conversation history
 
-(no Harness modules)
-Harness Engine + LLM
+
+(No Harness modules)
+```
+
+
+---
+
+## Harness Engine + LLM
+
+
+Definition:
+
+```
 DeepSeek-chat
 
 +
+
 Harness Engine
 
 +
+
 Memory
 
 +
+
 Soul
 
 +
+
 Emotion
 
 +
+
 Arc
 
 +
+
 Safety
 
 +
+
 Scoring
-Results
-Metric	Baseline	Harness
-Persona Consistency	8.82	9.00
-Memory Accuracy	6.55	7.09
-Relationship Continuity	7.45	7.91
-Emotional Consistency	8.82	9.00
+```
 
-Evaluation cost:
 
+---
+
+## Evaluation Result
+
+
+![Character Drift Evaluation](docs/images/evaluation.png)
+
+
+---
+
+# Results
+
+
+| Metric | Baseline | Harness |
+|---|---:|---:|
+| Persona Consistency | 8.82 | 9.00 |
+| Memory Accuracy | 6.55 | 7.09 |
+| Relationship Continuity | 7.45 | 7.91 |
+| Emotional Consistency | 8.82 | 9.00 |
+
+
+Experiment cost:
+
+```
 Input tokens: ~411k
+
 Output tokens: ~14k
+
 Cost: ~$0.23
-Project Structure
+```
+
+
+---
+
+# Project Structure
+
+
+```
 coral303-harness/
 
 ├── app/
 ├── admin/
 ├── api/
+
 ├── harness_core.py
 ├── orchestrator.py
 
@@ -436,6 +585,21 @@ coral303-harness/
 ├── config.example.yaml
 ├── web_ui.py
 └── LICENSE
-License
+```
 
-Apache License 2.0
+
+---
+
+# License
+
+
+This project is licensed under the Apache License 2.0.
+
+
+See:
+
+```
+LICENSE
+```
+
+for details.
