@@ -1,518 +1,460 @@
+# Harness
 
-# README.md
+## Coral303
 
-```markdown
-# Coral 303
+一个面向长期存在型 AI 角色的持久化 AI Character Harness。
 
-## Persistent AI Characters & Virtual World Engine
+Harness（Coral303）旨在构建具有长期记忆、人格连续性、情绪状态和关系演化能力的 AI 角色运行框架。
 
-<p align="center">
+不同于传统 Chatbot 每次对话都是独立上下文，Harness 在用户和大语言模型（LLM）之间加入了一层持续运行时系统，用于管理：
 
-<img src="./docs/assets/logo.png" />
-
-</p>
-
-
-Coral is an AI character and virtual world engine designed to create **digital beings with persistent memory, personality continuity, emotional evolution, and long-term existence.**
-
-Unlike traditional conversational AI systems that reset after every interaction, Coral provides an execution framework where AI characters can:
-
-- Remember previous experiences
-- Maintain consistent identities
-- Develop emotional states
-- Evolve through narrative events
-- Exist inside persistent worlds
+- 角色身份
+- 长期记忆
+- 情绪状态
+- 用户关系
+- 叙事发展
+- 安全控制
+- 运行评估
 
 
-```
+目标是提供一个工程化基础，使 AI 角色能够在长期交互中保持稳定、一致和可演化。
+
 
 ---
 
-# Coral 303 Philosophy
+# 核心功能
 
-```
-Digital beings should not disappear.
-```
-
-Digital entities should not be temporary sessions.
-
-They should have:
-
-* Memory
-* Identity
-* History
-* Relationships
-* Growth
-
-Coral aims to provide the infrastructure required for building AI beings that can continuously exist, learn, and evolve.
-
----
-
-# What is Coral?
-
-Coral is powered by **Harness Engine**, a runtime architecture for persistent AI characters.
-
-The engine manages the complete lifecycle of an AI being:
-
-```
-User Interaction
-        ↓
-Context Understanding
-        ↓
-Memory Retrieval
-        ↓
-Personality State
-        ↓
-Emotion Processing
-        ↓
-LLM Reasoning
-        ↓
-Memory Formation
-        ↓
-Character Evolution
-```
-
-The goal is not simply generating responses.
-
-The goal is maintaining a **continuous digital existence.**
-
----
-
-# Core Engine
 
 ## Harness Engine
 
-Harness Engine is the execution core behind Coral.
+Harness Engine 是整个系统的核心运行引擎。
 
-It provides:
+负责：
 
-* Unified AI interaction pipeline
-* Character runtime management
-* Memory lifecycle management
-* Personality state management
-* Emotion simulation
-* Narrative evolution
-* Safety and evaluation layers
+- 请求编排
+- 上下文构建
+- 角色切换
+- 记忆注入
+- LLM 调用
+- 后处理
+- 日志记录
+- 评分评估
 
-All external interfaces eventually converge into:
 
-```
-orchestrate_turn()
-```
+核心组件：
 
-which acts as the central execution pipeline.
 
-Supported interfaces:
-
-* Web UI
-* REST API
-* CLI
-
----
-
-# Architecture Overview
-
-```
-Request
-
-   ↓
-
-Interaction Layer
-
-(Web / API / CLI)
-
-   ↓
-
-Control Layer
-
-(Harness Engine)
-
-   ↓
-
-Cognition Layer
-
-(Soul / Memory / Emotion / Relationship)
-
-   ↓
-
-Execution Layer
-
-(LLM Runtime)
-
-   ↓
-
-Persistence Layer
-
-(Database / Character State / World State)
-
-```
-
-## Five Layer Architecture
-
-## 1. Interaction Layer
-
-Provides multiple ways to interact with AI beings.
-
-Components:
-
-```
-web_ui.py
-app/
-admin/
-api/
-cli_demo.py
-```
-
-Capabilities:
-
-* Web chat interface
-* User authentication
-* Character management
-* Administration dashboard
-* REST API access
-
----
-
-## 2. Control Layer
-
-The brain of Coral.
-
-Main components:
-
-```
-harness_core.py
 orchestrator.py
+harness_core.py
 context_builder.py
 memory_writer.py
-```
 
-Responsibilities:
 
-* Turn orchestration
-* Prompt construction
-* Runtime management
-* Memory writing pipeline
-* Execution tracking
-
-Every conversation follows:
-
-```
-Input
-
-↓
-
-Safety Check
-
-↓
-
-Context Building
-
-↓
-
-Character Runtime
-
-↓
-
-LLM Generation
-
-↓
-
-Memory Analysis
-
-↓
-
-State Update
-
-↓
-
-Persistence
-
-```
 
 ---
 
-# 3. Cognition Layer
+# Soul 系统
 
-The cognition system gives AI characters continuity.
+Soul 系统负责角色的长期身份定义。
 
-## Soul System
+管理：
 
-Location:
+- 核心人格
+- 身份结构
+- 角色状态
+- 叙事约束
+- 状态迁移
 
-```
+
+目录：
+
+
 soul/
-```
 
-Responsible for:
 
-* Identity definition
-* Character traits
-* Persistent self-state
-* Narrative constraints
-
-Example:
-
-```
-Soul
-
-├── personality
-├── values
-├── memories
-├── relationships
-└── narrative state
-```
 
 ---
 
-## Emotion System
+# Memory 系统
 
-Based on PAD emotion modeling.
+Harness 提供多层记忆系统。
 
-Features:
+包括：
 
-* Emotional state tracking
-* Emotional decay
-* Rule-based transition
-* LLM assisted analysis
+## 短期记忆
 
-Components:
+维护当前会话上下文。
 
-```
+
+## 长期记忆
+
+包含：
+
+- Raw Memory
+- Semantic Memory
+- Memory Retrieval
+- Embedding 相似度检索
+
+
+目录：
+
+
+memory/
+
+
+
+---
+
+# Emotion 系统
+
+Emotion 使用 PAD 情绪模型。
+
+支持：
+
+- Pleasure（愉悦）
+- Arousal（激活）
+- Dominance（支配）
+
+
+同时支持：
+
+- 情绪衰减
+- 情绪阶段变化
+- 情绪状态渲染
+
+
+目录：
+
+
 emotion/
 
-├── manager.py
-├── analyzer.py
-├── rules
-├── decay.py
-└── stage.py
-```
+
 
 ---
 
-## Memory System
+# Relationship 系统
 
-Coral separates memory into multiple layers.
+Relationship 用于维护用户和角色之间的长期关系状态。
 
-```
-Conversation
+包括：
 
-↓
+- Pair State
+- Social Graph
+- Relationship Migration
 
-Session Memory
 
-↓
+目录：
 
-Raw Memory
 
-↓
+relationship/
 
-Semantic Memory
 
-↓
-
-Relationship Memory
-
-```
-
-Capabilities:
-
-* Short-term memory
-* Long-term memory
-* Semantic retrieval
-* Vector similarity search
-* Memory extraction
 
 ---
 
-## Character Arc System
+# Arc 系统
 
-Characters are not static profiles.
+Arc 系统负责角色长期叙事发展。
 
-The Arc system enables:
+用于：
 
-* Narrative progression
-* Experience accumulation
-* Long-term development
+- 角色成长
+- 状态推进
+- 行为演化
 
-```
-Event
 
-↓
+目录：
 
-Analysis
 
-↓
+arc/
 
-Arc Update
 
-↓
-
-Character Evolution
-
-```
 
 ---
 
-# 4. Execution Layer
+# Safety 系统
 
-Supports LLM inference through:
+Safety 层提供运行时安全控制。
 
-```
-ollama_client.py
-```
+包括：
 
-Features:
+- 输入过滤
+- 输出过滤
+- Safety Gateway
+- 审计记录
 
-* Streaming generation
-* Non-streaming generation
-* Retry handling
-* Cancellation support
-* Thinking model compatibility
 
-Embedding support:
+目录：
 
-```
-embeddings.py
-```
 
-Provides:
+safety/
 
-* Vector generation
-* Similarity calculation
-* Memory retrieval
+
 
 ---
 
-# 5. Persistence Layer
-
-Coral stores the complete existence state of characters.
-
-Structure:
-
-```
-characters/
-
- └── character_name/
-
-      ├── soul_core.json
-      ├── soul_state.json
-      ├── memory_state.json
-      └── emotion_state.json
+# 系统架构
 
 
-users/
-
- └── user_id/
-
-      └── characters/
+Harness 使用五层架构：
 
 
-database/
+交互层 Interaction Layer
 
- └── harness.db
+    ↓
+
+控制层 Control Layer
+
+    ↓
+
+认知层 Cognition Layer
+
+    ↓
+
+执行层 Execution Layer
+
+    ↓
+
+持久层 Persistence Layer
 
 
-worlds/
 
- ├── cyber_station.json
- └── low_gravity.json
+## 交互层
 
-```
+用户入口：
 
-Persistent data includes:
+- Flask Web UI
+- REST API
+- CLI
 
-* Character identity
-* Memories
-* Emotional state
-* Relationships
-* World information
-* Conversation history
 
----
+## 控制层
 
-# Core Features
+运行编排：
 
-## Persistent Memory
+- Harness Engine
+- Turn Processing
+- Context Builder
 
-AI characters remember.
 
-Supported:
+## 认知层
 
-✅ Session memory
-✅ Semantic memory
-✅ Relationship memory
-✅ Vector retrieval
+角色智能：
 
----
+- Soul
+- Memory
+- Emotion
+- Relationship
+- Arc
 
-## Personality Continuity
 
-Characters maintain:
+## 执行层
 
-* Personality traits
-* Values
-* Identity
-* Behavioral patterns
+模型调用：
 
----
+- Ollama Backend
+- DeepSeek API
 
-## Emotional Evolution
 
-Characters have dynamic internal states.
+## 持久层
 
-Supported:
+数据存储：
 
-* PAD emotion model
-* Emotional decay
-* State transitions
+- SQLite
+- Character State
+- Memory State
+- Session Logs
+
 
 ---
 
-## Virtual World Support
+# Web 页面
 
-Coral supports persistent worlds:
 
-Example:
+Harness 提供基于 Flask 的 Web UI。
 
-```
-worlds/
+功能：
 
-├── cyber_station.json
+- 用户认证
+- 角色管理
+- 对话交互
+- 记忆查看
+- 管理后台
 
-└── low_gravity.json
 
-```
+启动：
 
-World state can influence:
+```bash
+python web_ui.py run
 
-* Character behavior
-* Memory formation
-* Narrative development
+访问：
 
----
+http://127.0.0.1:7860
+安装
+环境要求
 
-# Project Structure
+推荐：
 
-```
-Coral 303
+Python 3.12
+
+支持：
+
+Python >=3.11
+
+安装依赖：
+
+pip install -r requirements.txt
+LLM 后端支持
+
+Harness 支持多种 LLM 后端。
+
+DeepSeek 云端 API
+
+Evaluation 测试使用：
+
+deepseek-chat
+
+接口：
+
+https://api.deepseek.com/v1/chat/completions
+
+测试参数：
+
+temperature = 0.7
+Ollama
+
+支持本地推理后端。
+
+快速开始
+
+克隆项目：
+
+git clone https://github.com/DiJiaoyv/coral303-harness.git
+
+进入目录：
+
+cd coral303-harness
+
+安装：
+
+pip install -r requirements.txt
+
+配置：
+
+DEEPSEEK_API_KEY=your_key
+
+运行：
+
+python web_ui.py run
+
+打开：
+
+http://127.0.0.1:7860
+Evaluation 测试
+100轮角色偏移测试
+
+测试目标：
+
+验证 AI 角色在长期连续交互中的稳定性。
+
+实验模型：
+
+DeepSeek-chat
+
+参数：
+
+temperature = 0.7
+Baseline LLM
+
+定义：
+
+DeepSeek-chat
+
++
+
+Kaspar 角色 system prompt
+
++
+
+完整对话历史
+
+
+（无 Harness 模块）
+Harness Engine + LLM
+
+定义：
+
+DeepSeek-chat
+
++
+
+Harness Engine
+
++
+
+Memory
+
++
+
+Soul
+
++
+
+Emotion
+
++
+
+Arc
+
++
+
+Safety
+
++
+
+Scoring
+测试结果
+指标	Baseline	Harness
+人格一致性 Persona Consistency	8.82	9.00
+记忆准确性 Memory Accuracy	6.55	7.09
+关系连续性 Relationship Continuity	7.45	7.91
+情绪一致性 Emotional Consistency	8.82	9.00
+
+实验成本：
+
+输入 Tokens: ~411k
+输出 Tokens: ~14k
+成本: ~$0.23
+项目结构
+coral303-harness/
+
+├── app/
+├── admin/
+├── api/
 
 ├── harness_core.py
 ├── orchestrator.py
+
 ├── soul/
-├── emotion/
 ├── memory/
+├── emotion/
 ├── relationship/
 ├── arc/
+
+├── database/
 ├── safety/
 ├── scoring/
-├── performance/
-├── database/
-├── api/
-├── app/
-├── admin/
-├── characters/
-├── worlds/
-└── deploy/
 
-```
+├── tests/
+├── deploy/
 
+├── requirements.txt
+├── config.example.yaml
+├── web_ui.py
+└── LICENSE
+License
+
+Apache License 2.0
+
+
+---
