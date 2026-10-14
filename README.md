@@ -1,7 +1,7 @@
 # Harness
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/DiJiaoyv/coral303-harness/main/docs/images/logo.png" width="220">
+<img src="https://raw.githubusercontent.com/DiJiaoyv/coral303-harness/main/docs/Coral%20logo.png" width="220">
 </p>
 
 <h2 align="center">Coral303</h2>
@@ -208,8 +208,9 @@ safety/
 Harness follows a five-layer architecture:
 
 
-![Harness Architecture](https://raw.githubusercontent.com/DiJiaoyv/coral303-harness/main/docs/images/architecture.png)
+![Harness Architecture](https://raw.githubusercontent.com/DiJiaoyv/coral303-harness/main/docs/architecture.png)
 
+Figure: Five-layer architecture of Harness.
 
 ```
 Interaction Layer
@@ -288,14 +289,12 @@ Harness provides a Flask-based Web UI.
 ## Login Interface
 
 
-![Harness Login](https://raw.githubusercontent.com/DiJiaoyv/coral303-harness/main/docs/images/web_login.png)
-
+![Harness Login](https://raw.githubusercontent.com/DiJiaoyv/coral303-harness/main/docs/web_login.png)
 
 ## Dashboard
 
 
-![Harness Dashboard](https://raw.githubusercontent.com/DiJiaoyv/coral303-harness/main/docs/images/web_dashboard.png)
-
+![Harness Dashboard](https://raw.githubusercontent.com/DiJiaoyv/coral303-harness/main/docs/web_dashboard.png)
 
 Features:
 
@@ -380,9 +379,11 @@ temperature = 0.7
 
 ## Ollama
 
+## Ollama
+
 Local inference backend is also supported.
 
-
+The default development configuration uses Ollama, while evaluation experiments were conducted with DeepSeek Cloud API.
 ---
 
 # Quick Start
@@ -440,8 +441,7 @@ http://127.0.0.1:7860
 
 The evaluation measures whether an AI character can maintain consistency during long-term interaction.
 
-![Character Drift Evaluation](https://raw.githubusercontent.com/DiJiaoyv/coral303-harness/main/docs/images/evaluation.png)
-
+![Character Drift Evaluation](https://raw.githubusercontent.com/DiJiaoyv/coral303-harness/main/docs/Evaluation.png)
 ## Experimental Setup
 
 
@@ -520,14 +520,6 @@ Safety
 
 Scoring
 ```
-
-
----
-
-## Evaluation Result
-
-
-![Character Drift Evaluation](https://raw.githubusercontent.com/DiJiaoyv/coral303-harness/main/docs/images/evaluation.png)
 
 
 ---
