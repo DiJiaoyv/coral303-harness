@@ -208,7 +208,7 @@ safety/
 Harness follows a five-layer architecture:
 
 
-![Harness Architecture](docs/images/architecture.png)
+![Harness Architecture](https://raw.githubusercontent.com/DiJiaoyv/coral303-harness/main/docs/images/architecture.png)
 
 
 ```
